@@ -10,18 +10,15 @@
 
 namespace Rover\CB\Config;
 
-use Bitrix\Main\ArgumentNullException;
-use Bitrix\Main\ArgumentOutOfRangeException;
 use \Bitrix\Main\Localization\Loc;
 use Bitrix\Main\NotImplementedException;
 use Bitrix\Main\SystemException;
 use Rover\CB\Helper\Log;
-use Rover\CB\Model\Rest;
-use Rover\CB\Model\Rest\Contact;
-use Rover\CB\Rest\Row;
-use Rover\Fadmin\Options\Settings;
+use Rover\CB\Rest;
+use Rover\CB\Rest\Tables;
 use \Bitrix\Main\Loader;
 use Bitrix\Main\Application;
+use Rover\Fadmin\Engine\Settings;
 use Rover\Fadmin\Tab;
 use \Rover\Fadmin\Options as FadminOptions;
 
@@ -198,7 +195,7 @@ class Options extends FadminOptions
     {
         if (is_null($this->connected) || $reload)
             try{
-                $this->connected = Row::getInstance()->isAuth();
+                $this->connected = Tables::getInstance()->isAuth();
             } catch (\Exception $e) {
                 $this->connected = false;
                 $this->message->addError($e->getMessage());
