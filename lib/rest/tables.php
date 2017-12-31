@@ -37,27 +37,7 @@ class Tables extends Rest
         if (empty($filter))
             return $tables;
 
-        $result = array();
-        foreach ($tables['data'] as $tableId => $tableData)
-        {
-            $tableData['id'] = $tableId;
-
-            foreach ($filter as $filterField => $filterValue)
-            {
-                if (!isset($tableData[$filterField]))
-                    continue(2);
-
-                if ($tableData[$filterField] != $filterValue)
-                    continue(2);
-            }
-
-            $result[$tableId] = $tableData;
-        }
-
-        $tables['data'] = $result;
-        $tables['count']= count($result);
-
-        return $tables;
+        return $this->filter($tables, $filter);
     }
 
     /**

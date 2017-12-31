@@ -331,4 +331,37 @@ abstract class Rest
 
         return $dir . 'cookie.txt';
     }
+
+    /**
+     * @param array $data
+     * @param array $filter
+     * @return array
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    protected function filter(array $data, array $filter)
+    {
+        $result = array();
+        foreach ($data['data'] as $tableId => $tableData)
+        {
+            $tableData['id'] = $tableId;
+
+            foreach ($filter as $filterField => $filterValue)
+            {
+                if (!isset($tableData[$filterField]))
+                    continue(2);
+
+                if ($tableData[$filterField] != $filterValue)
+                    continue(2);
+            }
+
+            unset($tableData['id']);
+
+            $result[$tableId] = $tableData;
+        }
+
+        $data['data'] = $result;
+        $data['count']= count($result);
+
+        return $data;
+    }
 }

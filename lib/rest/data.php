@@ -63,7 +63,7 @@ abstract class Data extends Rest
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 0)
+    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -101,7 +101,7 @@ abstract class Data extends Rest
         $data = array(
             'table_id'  => $tableId,
             'cals'      => $cals,
-            'fields'    => $fields,
+            'data'      => $fields,
             'filter'    => $filter
         );
 

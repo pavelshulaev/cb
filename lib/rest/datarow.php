@@ -42,7 +42,7 @@ class DataRow extends Data
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 0)
+    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
     {
         $fields = $this->addKey($fields, 'row');
         $filter = $this->addKey($filter, 'row');
