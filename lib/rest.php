@@ -260,7 +260,7 @@ abstract class Rest
         }
 
         $requestUrl = $this->siteName . $url;
-
+        
         if ($type == self::TYPE__GET)
             $requestUrl .= '?' . http_build_query($data);
 
