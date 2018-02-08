@@ -38,33 +38,31 @@ class Tabs
 	{
 		return $options->getDependenceStatus()
             ? array(
-                self::getMainTab($options),
+                self::getMainTab(),
             ) : array();
 	}
 
     /**
-     * @param Options $options
      * @return array
      * @throws ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-	protected static function getMainTab(Options $options)
+	protected static function getMainTab()
 	{
 		return array(
 			'name'          => self::TAB__MAIN,
 			'label'         => Loc::getMessage(self::TAB__MAIN . '_label'),
 			'description'   => Loc::getMessage(self::TAB__MAIN . '_descr'),
-			'inputs'        => self::getMainTabInputs($options)
+			'inputs'        => self::getMainTabInputs()
         );
 	}
 
     /**
-     * @param Options $options
      * @return array
      * @throws ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-	protected static function getMainTabInputs(Options $options)
+	protected static function getMainTabInputs()
 	{
 		$connectionInputs = array(
 		    InputFactory::getCheckbox(Options::INPUT__ENABLED, 'Y'),

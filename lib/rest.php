@@ -9,15 +9,14 @@
  */
 
 namespace Rover\CB;
+
 use Bitrix\Main\Application;
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentOutOfRangeException;
-use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\SystemException;
 use Bitrix\Main\Web\Json;
 use Rover\CB\Config\Dependence;
 use Rover\CB\Config\Options;
-
 /**
  * Class Rest
  *
@@ -89,7 +88,7 @@ abstract class Rest
         $this->login    = $login;
         $this->apiKey   = $apiKey;
 
-        $this->authProcess();
+        $this->auth();
     }
 
     private function __clone() {}
@@ -97,17 +96,22 @@ abstract class Rest
 
     /**
      * @return bool
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function isAuth()
+    {
+        return strlen(self::$accessId) > 0;
+    }
+
+    /**
      * @throws ArgumentNullException
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    protected function authProcess()
+    protected function auth()
     {
-        if (strlen(self::$accessId))
-            return true;
-
-        $salt           = $this->authRequest();
-        self::$accessId = $this->auth($salt);
+        if (!self::isAuth())
+            self::$accessId = $this->getAccessId($this->getSalt());
     }
 
     /**
@@ -116,7 +120,7 @@ abstract class Rest
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    protected function authRequest()
+    protected function getSalt()
     {
         $params = array(
             'v'     => '1.0',
@@ -138,7 +142,7 @@ abstract class Rest
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function auth($salt)
+    public function getAccessId($salt)
     {
         $salt = trim($salt);
         if (!$salt)
@@ -183,11 +187,10 @@ abstract class Rest
 
         if (!isset(self::$instances[$className]) || $reload){
 
-            $siteName   = Options::get()->getSiteName();
-            $apiKey     = Options::get()->getApiKey();
-            $login      = Options::get()->getLogin();
+            $options    = Options::get();
+            $restObject = new $className($options->getSiteName(),
+                $options->getLogin(), $options->getApiKey());
 
-            $restObject = new $className($siteName, $login, $apiKey);
             if (!$restObject instanceof Rest)
                 throw new ArgumentOutOfRangeException('instance');
 
@@ -231,15 +234,6 @@ abstract class Rest
     }
 
     /**
-     * @return bool
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    public static function isAuth()
-    {
-        return strlen(self::$accessId) > 0;
-    }
-
-    /**
      * @param       $type
      * @param       $url
      * @param array $data
@@ -260,7 +254,7 @@ abstract class Rest
         }
 
         $requestUrl = $this->siteName . $url;
-     
+
         if ($type == self::TYPE__GET)
             $requestUrl .= '?' . http_build_query($data);
 

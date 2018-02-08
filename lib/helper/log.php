@@ -13,7 +13,6 @@ namespace Rover\CB\Helper;
 use Bitrix\Main\Application;
 use Rover\CB\Config\Dependence;
 use Rover\CB\Config\Options;
-use Rover\CB\Config\Tabs;
 use Rover\Fadmin\Inputs\Input;
 use \Rover\Fadmin\Helper\Input as InputFactory;
 /**
@@ -95,10 +94,9 @@ class Log
      */
     public static function checkMaxSize($path)
     {
-        $logMaxSize = Options::get()->getLogMaxSizeBytes();
+        $logMaxSize = 1024 * 1024;
         if (!$logMaxSize)
             return;
-
 
         if (filesize($path) > $logMaxSize)
             file_put_contents($path, '');
