@@ -18,7 +18,7 @@ use Rover\CB\Rest;
 use Rover\CB\Rest\Tables;
 use \Bitrix\Main\Loader;
 use Bitrix\Main\Application;
-use Rover\Fadmin\Engine\Settings;
+use Rover\Fadmin\Options\Settings;
 use Rover\Fadmin\Tab;
 use \Rover\Fadmin\Options as FadminOptions;
 

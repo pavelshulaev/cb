@@ -10,7 +10,12 @@
 
 namespace Rover\CB\Rest;
 
-
+/**
+ * Class DataRow
+ *
+ * @package Rover\CB\Rest
+ * @author  Pavel Shulaev (https://rover-it.me)
+ */
 class DataRow extends Data
 {
     /**

@@ -17,4 +17,6 @@ if (!Loader::includeModule('rover.fadmin'))
 Loc::LoadMessages(__FILE__);
 Loc::loadMessages($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/options.php");
 
-(new Form(Options::get()))->show();
+
+$form = new Form(Options::get());
+$form->show();
