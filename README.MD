@@ -94,9 +94,9 @@
 
 <b>`\Rover\CB\Rest\Data`</b> Работа с данными в таблицах.
 
-* `create($tableId, $cals = true, array $fields = array())`
+* `create($tableId, $cals = true, array $data = array())`
 * `read($tableId, $cals = true, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)`
-* `update($tableId, $cals = true, array $fields = array(), array $filter = array())`
+* `update($tableId, $cals = true, array $data = array(), array $filter = array())`
 * `delete($tableId, $cals = true, array $filter = array())`
 * `files($tableId, $fileFieldId, $lineId, $fileName)` - получение файла, прикременного к записи. Описание [здесь](https://clientbase.ru/help/for_admin_16/api/rabota_s_fajlami/poluchenie_fajlov/);
 
