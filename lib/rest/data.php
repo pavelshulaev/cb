@@ -158,7 +158,7 @@ class Data extends Rest
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function getFiles($tableId, $fileFieldId, $lineId, $fileName)
+    public function files($tableId, $fileFieldId, $lineId, $fileName)
     {
         $tableId = intval($tableId);
         if (!$tableId)
