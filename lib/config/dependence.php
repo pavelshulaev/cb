@@ -26,7 +26,7 @@ class Dependence
 	const MIN_VERSION__FADMIN   = '1.6.6';
 	const MIN_VERSION__PARAMS   = '0.8.3';
 	const MIN_VERSION__MAIN     = '15.5.4';
-    const MIN_VERSION__PHP      = 50400;
+    const MIN_VERSION__PHP      = 50303;
 
 	/**
 	 * @var array
@@ -146,20 +146,6 @@ class Dependence
 		return $this;
 	}
 
-	/**
-	 * @return $this
-	 * @author Pavel Shulaev (https://rover-it.me)
-	 */
-	public function checkParamsVer()
-	{
-		if (!ModuleManager::isModuleInstalled('rover.params'))
-			$this->addError(Loc::getMessage('rover-cb__rover-params_not_found'));
-		elseif (!CheckVersion(self::getVersion('rover.params'), self::MIN_VERSION__PARAMS))
-			$this->addError(Loc::getMessage('rover-cb__params-version-error'));
-
-		return $this;
-	}
-
     /**
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
@@ -218,8 +204,7 @@ class Dependence
 			->checkPhpVer()
 			->checkMainVer()
 			->checkCurl()
-			->checkFadminVer()
-			->checkParamsVer();
+			->checkFadminVer();
 	}
 
     /**

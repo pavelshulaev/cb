@@ -105,7 +105,6 @@ class rover_cb extends CModule
 	}
 
     /**
-     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
 	function DoUninstall()

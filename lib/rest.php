@@ -56,7 +56,7 @@ class Rest
     /**
      * @var array
      */
-    protected static $instances = [];
+    protected static $instances = array();
 
     /**
      * Rest constructor.

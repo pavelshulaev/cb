@@ -24,9 +24,7 @@ Loc::loadMessages(__FILE__);
  */
 class Tabs
 {
-	const TAB__MAIN         = 'settings';
-
-
+	const TAB__MAIN = 'settings';
 
     /**
      * @param Options $options

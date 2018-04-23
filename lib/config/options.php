@@ -22,9 +22,8 @@ use Rover\Fadmin\Options\Settings;
 use Rover\Fadmin\Tab;
 use \Rover\Fadmin\Options as FadminOptions;
 
-if (!Loader::includeModule("rover.fadmin")
-	|| !Loader::includeModule('rover.params'))
-	throw new SystemException('rover.fadmin or rover.params modules not found');
+if (!Loader::includeModule("rover.fadmin"))
+	throw new SystemException('rover.fadmin module not found');
 
 Loc::loadMessages(__FILE__);
 /**
