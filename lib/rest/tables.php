@@ -12,6 +12,7 @@ namespace Rover\CB\Rest;
 
 use Bitrix\Main\ArgumentNullException;
 use Rover\CB\Rest;
+use Rover\CB\Helper\Filter;
 
 /**
  * Class Table
@@ -34,10 +35,8 @@ class Tables extends Rest
     public function getList(array $filter = array())
     {
         $tables = $this->requestPost(self::URL__LIST);
-        if (empty($filter))
-            return $tables;
 
-        return $this->filter($tables, $filter);
+        return Filter::run($tables, $filter);
     }
 
     /**

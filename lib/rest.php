@@ -17,13 +17,15 @@ use Bitrix\Main\SystemException;
 use Bitrix\Main\Web\Json;
 use Rover\CB\Config\Dependence;
 use Rover\CB\Config\Options;
+use Rover\CB\Helper\Log;
+
 /**
  * Class Rest
  *
  * @package Rover\CB
  * @author  Pavel Shulaev (https://rover-it.me)
  */
-abstract class Rest
+class Rest
 {
     const URL__REQUEST = '/api/auth/request/';
     const URL__AUTH    = '/api/auth/auth/';
@@ -182,7 +184,7 @@ abstract class Rest
      */
     public static function build($className, $reload = false)
     {
-        if (!strlen($className) || !(class_exists($className)))
+        if (!strlen($className) || !class_exists($className))
             throw new ArgumentOutOfRangeException('className');
 
         if (!isset(self::$instances[$className]) || $reload){
@@ -216,7 +218,7 @@ abstract class Rest
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    protected function requestPost($url, array $data = array())
+    public function requestPost($url, array $data = array())
     {
         return $this->request(self::TYPE__POST, $url, $data);
     }
@@ -228,7 +230,7 @@ abstract class Rest
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    protected function requestGet($url, array $data = array())
+    public function requestGet($url, array $data = array())
     {
         return $this->request(self::TYPE__GET, $url, $data);
     }
@@ -241,7 +243,7 @@ abstract class Rest
      * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)3
      */
-    private function request($type, $url, array $data = array())
+    public function request($type, $url, array $data = array())
     {
         // add access_id
         if (($url != self::URL__REQUEST)
@@ -279,6 +281,8 @@ abstract class Rest
         curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch,CURLOPT_SSL_VERIFYHOST, 0);
 
+        Log::addNote("REQUEST\ntype: {$type}\nurl: {$url}\ndata: " . print_r($data, 1) . "\n");
+
         $out    = curl_exec($ch);
         $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
@@ -287,6 +291,8 @@ abstract class Rest
         $response = strlen($out)
             ? Json::decode($out)
             : array();
+
+        Log::addNote("RESPONSE\n" . print_r($response, 1) . "\n");
 
         if ((($code == 200) || ($code == 201) || ($code == 204))
             && array_key_exists('code', $response) && $response['code'] == 0)
@@ -307,6 +313,8 @@ abstract class Rest
 
         $errorMessage .= ' (' . $errorCode . ')';
 
+        Log::addError("REQUEST ERROR\n" . $errorMessage . "\n");
+
         throw new SystemException($errorMessage, $code);
     }
 
@@ -324,38 +332,5 @@ abstract class Rest
             throw new SystemException(implode('<br>', $dependence->getErrors()));
 
         return $dir . 'cookie.txt';
-    }
-
-    /**
-     * @param array $data
-     * @param array $filter
-     * @return array
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    protected function filter(array $data, array $filter)
-    {
-        $result = array();
-        foreach ($data['data'] as $tableId => $tableData)
-        {
-            $tableData['id'] = $tableId;
-
-            foreach ($filter as $filterField => $filterValue)
-            {
-                if (!isset($tableData[$filterField]))
-                    continue(2);
-
-                if ($tableData[$filterField] != $filterValue)
-                    continue(2);
-            }
-
-            unset($tableData['id']);
-
-            $result[$tableId] = $tableData;
-        }
-
-        $data['data'] = $result;
-        $data['count']= count($result);
-
-        return $data;
     }
 }

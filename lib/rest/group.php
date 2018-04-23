@@ -18,9 +18,9 @@ use Rover\CB\Helper\Filter;
  * @package Rover\CB\Rest
  * @author  Pavel Shulaev (https://rover-it.me)
  */
-class User extends Rest
+class Group extends Rest
 {
-    const URL__LIST = '/api/user/get_list/';
+    const URL__LIST = '/api/group/get_list/';
 
     /**
      * @param array $filter
@@ -30,8 +30,8 @@ class User extends Rest
      */
     public function getList(array $filter = array())
     {
-        $users = $this->requestPost(self::URL__LIST);
+        $groups = $this->requestPost(self::URL__LIST);
 
-        return Filter::run($users, $filter);
+        return Filter::run($groups, $filter);
     }
 }

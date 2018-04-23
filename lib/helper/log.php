@@ -108,7 +108,7 @@ class Log
      */
     public static function getDir()
     {
-        return Application::getDocumentRoot() . '/upload/rover.amocrm/log/';
+        return Application::getDocumentRoot() . '/upload/rover.cb/log/';
     }
 
     /**
