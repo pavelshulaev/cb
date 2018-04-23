@@ -19,23 +19,23 @@ use Rover\CB\Rest;
  * @package Rover\CB\Rest
  * @author  Pavel Shulaev (https://rover-it.me)
  */
-abstract class Data extends Rest
+class Data extends Rest
 {
     const URL__CREATE   = '/api/data/create/';
     const URL__READ     = '/api/data/read/';
     const URL__UPDATE   = '/api/data/update/';
     const URL__DELETE   = '/api/data/delete/';
-
+    const URL__FILES    = '/api/data/files/';
     /**
      * @param       $tableId
-     * @param array $fields
+     * @param array $data
      * @param bool  $cals
      * @return mixed
      * @throws ArgumentNullException
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function create($tableId, $cals = false, array $fields = array())
+    public function create($tableId, $cals = true, array $data = array())
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -44,7 +44,7 @@ abstract class Data extends Rest
         $data = array(
             'table_id'  => $tableId,
             'cals'      => $cals,
-            'data'      => $fields
+            'data'      => $data
         );
 
         return $this->requestPost(self::URL__CREATE, $data);
@@ -63,7 +63,7 @@ abstract class Data extends Rest
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
+    public function read($tableId, $cals = true, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -85,14 +85,14 @@ abstract class Data extends Rest
     /**
      * @param       $tableId
      * @param bool  $cals
-     * @param array $fields
+     * @param array $data
      * @param array $filter
      * @return mixed
      * @throws ArgumentNullException
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function update($tableId, $cals = false, array $fields = array(), array $filter = array())
+    public function update($tableId, $cals = true, array $data = array(), array $filter = array())
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -101,7 +101,7 @@ abstract class Data extends Rest
         $data = array(
             'table_id'  => $tableId,
             'cals'      => $cals,
-            'data'      => $fields,
+            'data'      => $data,
             'filter'    => $filter
         );
 
@@ -117,7 +117,7 @@ abstract class Data extends Rest
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function delete($tableId, $cals = false, array $filter = array())
+    public function delete($tableId, $cals = true, array $filter = array())
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -146,5 +146,31 @@ abstract class Data extends Rest
             throw new ArgumentNullException('key');
 
         return array($key => $fields);
+    }
+
+    /**
+     * @param $tableId
+     * @param $fileFieldId
+     * @param $lineId
+     * @param $fileName
+     * @return mixed
+     * @throws ArgumentNullException
+     * @throws \Bitrix\Main\SystemException
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public function getFiles($tableId, $fileFieldId, $lineId, $fileName)
+    {
+        $tableId = intval($tableId);
+        if (!$tableId)
+            throw new ArgumentNullException('tableId');
+
+        $data = array(
+            'table_id'      => $tableId,
+            'file_field_id' => $fileFieldId,
+            'line_id'       => $lineId,
+            'file_name'     => $fileName,
+        );
+
+        return $this->requestPost(self::URL__FILES, $data);
     }
 }

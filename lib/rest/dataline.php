@@ -21,24 +21,24 @@ class DataLine extends Data
     /**
      * @param       $tableId
      * @param bool  $cals
-     * @param array $fields
+     * @param array $line
      * @return mixed
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function create($tableId, $cals = false, array $fields = array())
+    public function create($tableId, $cals = true, array $line = array())
     {
-        $fields = $this->addKey($fields, 'line');
+        $data = $this->addKey($line, 'line');
 
-        return parent::create($tableId, $cals, $fields);
+        return parent::create($tableId, $cals, $data);
     }
 
     /**
      * @param       $tableId
      * @param bool  $cals
-     * @param array $fields
-     * @param array $filter
+     * @param array $line
+     * @param array $filterLine
      * @param array $sort
      * @param int   $start
      * @param int   $limit
@@ -47,10 +47,10 @@ class DataLine extends Data
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
+    public function read($tableId, $cals = true, array $line = array(), array $filterLine = array(), array $sort = array(), $start = 0, $limit = 500)
     {
-        $fields = $this->addKey($fields, 'line');
-        $filter = $this->addKey($filter, 'line');
+        $fields = $this->addKey($line, 'line');
+        $filter = $this->addKey($filterLine, 'line');
         $sort   = $this->addKey($sort, 'line');
 
         return parent::read($tableId, $cals, $fields, $filter, $sort, $start, $limit);
@@ -59,33 +59,33 @@ class DataLine extends Data
     /**
      * @param       $tableId
      * @param bool  $cals
-     * @param array $fields
-     * @param array $filter
+     * @param array $line
+     * @param array $filterLine
      * @return mixed
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function update($tableId, $cals = false, array $fields = array(), array $filter = array())
+    public function update($tableId, $cals = true, array $line = array(), array $filterLine = array())
     {
-        $fields = $this->addKey($fields, 'line');
-        $filter = $this->addKey($filter, 'line');
+        $data   = $this->addKey($line, 'line');
+        $filter = $this->addKey($filterLine, 'line');
 
-        return parent::update($tableId, $cals, $fields, $filter);
+        return parent::update($tableId, $cals, $data, $filter);
     }
 
     /**
      * @param       $tableId
      * @param bool  $cals
-     * @param array $filter
+     * @param array $filterLine
      * @return mixed
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function delete($tableId, $cals = false, array $filter = array())
+    public function delete($tableId, $cals = true, array $filterLine = array())
     {
-        $filter = $this->addKey($filter, 'line');
+        $filter = $this->addKey($filterLine, 'line');
 
         return parent::delete($tableId, $cals, $filter);
     }

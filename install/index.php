@@ -37,7 +37,7 @@ class rover_cb extends CModule
 			$this->MODULE_VERSION		= $arModuleVersion["VERSION"];
 			$this->MODULE_VERSION_DATE	= $arModuleVersion["VERSION_DATE"];
 		} else
-			$cbErrors[] = Loc::getMessage('rover_acrm__version_info_error');
+			$cbErrors[] = Loc::getMessage('rover-cb__version_info_error');
 
 		$this->MODULE_NAME          = Loc::getMessage("rover-cb__MODULE_NAME");
 		$this->MODULE_DESCRIPTION   = Loc::getMessage("rover-cb__MODULE_DESC");
@@ -84,7 +84,7 @@ class rover_cb extends CModule
 
             $cbErrors = array_merge($cbErrors, $depErrors);
         } else
-		    $cbErrors[] = Loc::getMessage('rover_acrm__dependence_error');
+		    $cbErrors[] = Loc::getMessage('rover-cb__dependence_error');
 
         $this->InstallDB();
 
