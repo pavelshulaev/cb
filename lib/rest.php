@@ -13,6 +13,7 @@ namespace Rover\CB;
 use Bitrix\Main\Application;
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentOutOfRangeException;
+use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\SystemException;
 use Bitrix\Main\Web\Json;
 use Rover\CB\Config\Dependence;
@@ -65,26 +66,29 @@ class Rest
      * @param $login
      * @param $apiKey
      * @throws ArgumentNullException
-     * @throws ArgumentOutOfRangeException
      * @throws SystemException
      */
     private function __construct($siteName, $login, $apiKey)
     {
+        $errors = array();
+
         $siteName = trim($siteName);
 
         if (!strlen($siteName))
-            throw new ArgumentNullException('siteName');
-
-        if (!preg_match('/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', $siteName))
-            throw new ArgumentOutOfRangeException('siteName');
+            $errors[] = Loc::getMessage('rover-cb__error-site-name-empty');
+        elseif (!preg_match('/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/', $siteName))
+            $errors[] = Loc::getMessage('rover-cb__error-site-name-incorrect');
 
         $login = trim($login);
         if (!strlen($login))
-            throw new ArgumentNullException('login');
+            $errors[] = Loc::getMessage('rover-cb__error-login-name-empty');
 
         $apiKey = trim($apiKey);
         if (!strlen($apiKey))
-            throw new ArgumentNullException('apiKey');
+            $errors[] = Loc::getMessage('rover-cb__error-api-name-empty');
+
+        if (count($errors))
+            throw new SystemException(implode("\n", $errors));
 
         $this->siteName = $siteName;
         $this->login    = $login;
