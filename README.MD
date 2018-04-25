@@ -128,7 +128,7 @@
 ## Требования	
 * php 5.3 или выше;
 * модуль php CURL;
-* [«Конструктор административной части» (rover.fadmin)](https://github.com/pavelshulaev/fadmin) 1.6.8 или выше.
+* [«Конструктор административной части» (rover.fadmin)](https://github.com/pavelshulaev/fadmin) 1.6.9 или выше.
 
 ## Контакты
 По всем вопросам вы можете связаться со мной по email: rover.webdev@gmail.com, либо через форму на сайте https://rover-it.me.
