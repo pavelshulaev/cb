@@ -131,6 +131,7 @@ class Options extends FadminOptions
 
     /**
      * @return self|\Rover\Fadmin\Options
+     * @throws \Bitrix\Main\ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
 	public static function get()
@@ -146,7 +147,8 @@ class Options extends FadminOptions
     {
         if (empty(self::$curSiteId)) {
             require_once(Application::getDocumentRoot() . "/bitrix/modules/main/include/mainpage.php");
-            self::$curSiteId = \CMainPage::GetSiteByHost();
+            $mainPage = new \CMainPage();
+            self::$curSiteId = $mainPage->GetSiteByHost();
         }
 
         return self::$curSiteId;
@@ -206,7 +208,8 @@ class Options extends FadminOptions
 
     /**
      * @param bool $reload
-     * @return mixed|null
+     * @return mixed
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function isEnabled($reload = false)
@@ -216,7 +219,8 @@ class Options extends FadminOptions
 
     /**
      * @param bool $reload
-     * @return mixed|null
+     * @return mixed
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function getLogin($reload = false)
@@ -226,7 +230,8 @@ class Options extends FadminOptions
 
     /**
      * @param bool $reload
-     * @return mixed|null
+     * @return mixed
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function getApiKey($reload = false)
@@ -236,7 +241,8 @@ class Options extends FadminOptions
 
     /**
      * @param bool $reload
-     * @return mixed|null
+     * @return mixed
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function getSiteName($reload = false)

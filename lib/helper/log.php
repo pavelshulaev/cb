@@ -59,6 +59,7 @@ class Log
      * @param      $message
      * @param null $data
      * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public static function add($file, $message, $data = null)
@@ -98,7 +99,7 @@ class Log
         if (!$logMaxSize)
             return;
 
-        if (filesize($path) > $logMaxSize)
+        if (file_exists($path) && (filesize($path) > $logMaxSize))
             file_put_contents($path, '');
     }
 

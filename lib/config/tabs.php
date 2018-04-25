@@ -12,6 +12,7 @@ namespace Rover\CB\Config;
 
 use Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\Localization\Loc;
+use Rover\CB\Helper\Log;
 use Rover\Fadmin\Helper\Input as InputFactory;
 
 Loc::loadMessages(__FILE__);
@@ -67,8 +68,18 @@ class Tabs
 		    InputFactory::getText(Options::INPUT__SITE_NAME),
 		    InputFactory::getText(Options::INPUT__LOGIN),
 		    InputFactory::getText(Options::INPUT__API_KEY),
-            InputFactory::getCheckbox(Options::INPUT__LOG_ENABLED, 'N')
         );
+
+		$logEnabled         = InputFactory::getCheckbox(Options::INPUT__LOG_ENABLED, 'N');
+		$logEnabled['help'] = str_replace(array(
+		    '#note-file-size#',
+		    '#error-file-size#',
+        ), array (
+            Log::getFileSize(Log::getPath(Log::FILE__NOTE)),
+            Log::getFileSize(Log::getPath(Log::FILE__ERROR))
+        ), $logEnabled['help']);
+
+        $connectionInputs[] = $logEnabled;
 
 		return $connectionInputs;
 	}

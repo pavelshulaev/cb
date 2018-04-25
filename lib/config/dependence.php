@@ -23,10 +23,10 @@ Loc::loadMessages(__FILE__);
 
 class Dependence
 {
-	const MIN_VERSION__FADMIN   = '1.6.6';
-	const MIN_VERSION__PARAMS   = '0.8.3';
+	const MIN_VERSION__FADMIN   = '1.6.9';
+	const MIN_VERSION__PARAMS   = '0.9.4';
 	const MIN_VERSION__MAIN     = '15.5.4';
-    const MIN_VERSION__PHP      = 50303;
+    const MIN_VERSION__PHP      = 50306;
 
 	/**
 	 * @var array
@@ -120,6 +120,18 @@ class Dependence
 		return $this;
 	}
 
+    /**
+     * @return $this
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+	public function checkModRewrite()
+    {
+        if (!in_array('mod_rewrite', apache_get_modules()))
+            $this->addError(Loc::getMessage('rover-cb__no_mod_rewrite_error'));
+
+        return $this;
+    }
+
 	/**
 	 * @return $this
 	 * @author Pavel Shulaev (https://rover-it.me)
@@ -204,6 +216,7 @@ class Dependence
 			->checkPhpVer()
 			->checkMainVer()
 			->checkCurl()
+			->checkModRewrite()
 			->checkFadminVer();
 	}
 

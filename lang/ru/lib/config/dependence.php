@@ -10,6 +10,7 @@ use \Rover\CB\Config\Dependence;
  */
 $MESS['rover-cb__php_version_error']	    = "Версия php ниже #min_php_version#";
 $MESS['rover-cb__no_curl_error']	        = "Не найдена библиотека CURL";
+$MESS['rover-cb__no_mod_rewrite_error']	    = "Не найден модуль mod_rewrite";
 $MESS['rover-cb__no_intl_error']	        = "Не найдено расширение php-intl";
 $MESS['rover-cb__rover-fadmin_not_found']	= 'Не найден модуль «<a href="http://marketplace.1c-bitrix.ru/solutions/rover.fadmin/">Конструктор административной части</a>» (rover.fadmin)';
 
