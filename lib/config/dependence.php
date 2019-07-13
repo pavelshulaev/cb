@@ -126,7 +126,11 @@ class Dependence
      */
 	public function checkModRewrite()
     {
-        if (!in_array('mod_rewrite', apache_get_modules()))
+        ob_start();
+        phpinfo(INFO_MODULES);
+        $contents = ob_get_clean();
+
+        if (strpos($contents, 'mod_rewrite') === false)
             $this->addError(Loc::getMessage('rover-cb__no_mod_rewrite_error'));
 
         return $this;
