@@ -23,10 +23,10 @@ Loc::loadMessages(__FILE__);
 
 class Dependence
 {
-	const MIN_VERSION__FADMIN   = '1.6.6';
-	const MIN_VERSION__PARAMS   = '0.8.3';
+	const MIN_VERSION__FADMIN   = '1.6.9';
+	const MIN_VERSION__PARAMS   = '0.9.4';
 	const MIN_VERSION__MAIN     = '15.5.4';
-    const MIN_VERSION__PHP      = 50400;
+    const MIN_VERSION__PHP      = 50306;
 
 	/**
 	 * @var array
@@ -101,7 +101,7 @@ class Dependence
 	public function checkPhpVer()
 	{
         if (PHP_VERSION_ID < self::MIN_VERSION__PHP)
-            $this->addError(Loc::getMessage('rover_acrm__php_version_error', array(
+            $this->addError(Loc::getMessage('rover-cb__php_version_error', array(
                 '#min_php_version#' => self::MIN_VERSION__PHP
             )));
 
@@ -115,10 +115,26 @@ class Dependence
 	public function checkCurl()
 	{
 		if (!function_exists('curl_init'))
-			$this->addError(Loc::getMessage('rover_acrm__no_curl_error'));
+			$this->addError(Loc::getMessage('rover-cb__no_curl_error'));
 
 		return $this;
 	}
+
+    /**
+     * @return $this
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+	public function checkModRewrite()
+    {
+        ob_start();
+        phpinfo(INFO_MODULES);
+        $contents = ob_get_clean();
+
+        if (strpos($contents, 'mod_rewrite') === false)
+            $this->addError(Loc::getMessage('rover-cb__no_mod_rewrite_error'));
+
+        return $this;
+    }
 
 	/**
 	 * @return $this
@@ -139,23 +155,9 @@ class Dependence
 	public function checkFadminVer()
 	{
 		if (!ModuleManager::isModuleInstalled('rover.fadmin'))
-			$this->addError(Loc::getMessage('rover_acrm__rover-fadmin_not_found'));
+			$this->addError(Loc::getMessage('rover-cb__rover-fadmin_not_found'));
 		elseif (!CheckVersion(self::getVersion('rover.fadmin'), self::MIN_VERSION__FADMIN))
 			$this->addError(Loc::getMessage('rover-cb__fadmin-version-error'));
-
-		return $this;
-	}
-
-	/**
-	 * @return $this
-	 * @author Pavel Shulaev (https://rover-it.me)
-	 */
-	public function checkParamsVer()
-	{
-		if (!ModuleManager::isModuleInstalled('rover.params'))
-			$this->addError(Loc::getMessage('rover_acrm__rover-params_not_found'));
-		elseif (!CheckVersion(self::getVersion('rover.params'), self::MIN_VERSION__PARAMS))
-			$this->addError(Loc::getMessage('rover-cb__params-version-error'));
 
 		return $this;
 	}
@@ -218,8 +220,8 @@ class Dependence
 			->checkPhpVer()
 			->checkMainVer()
 			->checkCurl()
-			->checkFadminVer()
-			->checkParamsVer();
+			->checkModRewrite()
+			->checkFadminVer();
 	}
 
     /**
