@@ -34,29 +34,19 @@ class Rest
     const TYPE__POST    = 'post';
     const TYPE__GET     = 'get';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $siteName;
 
-    /**
-     * @var
-     */
+    /** @var string */
     protected $login;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $apiKey;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected static $accessId;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $instances = array();
 
     /**
@@ -183,7 +173,9 @@ class Rest
      * @param      $className
      * @param bool $reload
      * @return mixed
+     * @throws ArgumentNullException
      * @throws ArgumentOutOfRangeException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public static function build($className, $reload = false)
@@ -193,9 +185,11 @@ class Rest
 
         if (!isset(self::$instances[$className]) || $reload){
 
-            $options    = Options::get();
-            $restObject = new $className($options->getSiteName(),
-                $options->getLogin(), $options->getApiKey());
+            $restObject = new $className(
+                Options::getSiteNameStatic(),
+                Options::getLoginStatic(),
+                Options::getApiKeyStatic()
+            );
 
             if (!$restObject instanceof Rest)
                 throw new ArgumentOutOfRangeException('instance');

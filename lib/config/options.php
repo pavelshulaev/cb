@@ -172,9 +172,6 @@ class Options extends FadminOptions
      */
     protected function beforeGetTabInfo(array &$params)
     {
-        /**
-         * @var Tab $tab
-         */
         $params['label'] = htmlspecialchars_decode($params['label']);
 
         try {
@@ -229,6 +226,17 @@ class Options extends FadminOptions
     }
 
     /**
+     * @return string
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function getLoginStatic()
+    {
+        return self::getValueStatic(self::MODULE_ID, self::INPUT__LOGIN);
+    }
+
+    /**
      * @param bool $reload
      * @return mixed
      * @throws SystemException
@@ -240,6 +248,17 @@ class Options extends FadminOptions
     }
 
     /**
+     * @return string
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function getApiKeyStatic()
+    {
+        return self::getValueStatic(self::MODULE_ID, self::INPUT__API_KEY);
+    }
+
+    /**
      * @param bool $reload
      * @return mixed
      * @throws SystemException
@@ -248,5 +267,16 @@ class Options extends FadminOptions
     public function getSiteName($reload = false)
     {
         return $this->getNormalValue(self::INPUT__SITE_NAME, '', $reload);
+    }
+
+    /**
+     * @return string
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function getSiteNameStatic()
+    {
+        return self::getValueStatic(self::MODULE_ID, self::INPUT__SITE_NAME);
     }
 }
