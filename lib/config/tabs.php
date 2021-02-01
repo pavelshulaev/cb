@@ -12,7 +12,8 @@ namespace Rover\CB\Config;
 
 use Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\Localization\Loc;
-use Rover\Fadmin\Helper\Input as InputFactory;
+use Rover\Fadmin\Helper\Input as InputFactoryOld;
+use Rover\Fadmin\Helper\InputFactory;
 
 Loc::loadMessages(__FILE__);
 
@@ -65,10 +66,10 @@ class Tabs
 	protected static function getMainTabInputs()
 	{
 		$connectionInputs = array(
-		    InputFactory::getCheckbox(Options::INPUT__ENABLED, 'Y'),
-		    InputFactory::getText(Options::INPUT__SITE_NAME),
-		    InputFactory::getText(Options::INPUT__LOGIN),
-		    InputFactory::getText(Options::INPUT__API_KEY),
+            InputFactory::getCheckbox(Options::INPUT__ENABLED, 'Y'),
+            InputFactory::getText(Options::INPUT__SITE_NAME),
+            InputFactory::getText(Options::INPUT__LOGIN),
+            InputFactory::getText(Options::INPUT__API_KEY),
             InputFactory::getCheckbox(Options::INPUT__LOG_ENABLED, 'N')
         );
 
