@@ -10,6 +10,9 @@
 
 namespace Rover\CB\Rest;
 
+use Bitrix\Main\ArgumentNullException;
+use Bitrix\Main\SystemException;
+
 /**
  * Class DataRow
  *
@@ -23,8 +26,8 @@ class DataRow extends Data
      * @param bool  $cals
      * @param array $fields
      * @return mixed
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws ArgumentNullException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function create($tableId, $cals = false, array $fields = array())
@@ -43,8 +46,8 @@ class DataRow extends Data
      * @param int   $start
      * @param int   $limit
      * @return mixed
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws ArgumentNullException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
@@ -62,8 +65,8 @@ class DataRow extends Data
      * @param array $fields
      * @param array $filter
      * @return mixed
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws ArgumentNullException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function update($tableId, $cals = false, array $fields = array(), array $filter = array())
@@ -79,8 +82,8 @@ class DataRow extends Data
      * @param bool  $cals
      * @param array $filter
      * @return mixed
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws ArgumentNullException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function delete($tableId, $cals = false, array $filter = array())

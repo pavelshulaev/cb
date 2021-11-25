@@ -11,10 +11,9 @@
 namespace Rover\CB\Helper;
 
 use Bitrix\Main\Application;
-use Rover\CB\Config\Dependence;
-use Rover\CB\Config\Options;
-use Rover\Fadmin\Inputs\Input;
-use \Rover\Fadmin\Helper\Input as InputFactory;
+use Rover\CB\Service\Dependence;
+use Rover\CB\Options;
+use Rover\CB\Options as OptionsAlias;
 /**
  * Class Log
  *
@@ -64,7 +63,7 @@ class Log
     public static function add($file, $message, $data = null)
     {
         if (is_null(self::$enabled))
-            self::$enabled = Input::getValueStatic(InputFactory::getCheckbox(Options::INPUT__LOG_ENABLED, 'N'), Options::MODULE_ID);
+            self::$enabled = Options::isLogEnabled();
 
         if (self::$enabled != 'Y')
             return;

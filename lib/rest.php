@@ -7,16 +7,14 @@
  *
  * @author Pavel Shulaev (https://rover-it.me)
  */
-
 namespace Rover\CB;
 
-use Bitrix\Main\Application;
+use Bitrix\Main\ArgumentException;
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentOutOfRangeException;
 use Bitrix\Main\SystemException;
+use Bitrix\Main\Web\HttpClient;
 use Bitrix\Main\Web\Json;
-use Rover\CB\Config\Dependence;
-use Rover\CB\Config\Options;
 /**
  * Class Rest
  *
@@ -28,32 +26,19 @@ abstract class Rest
     const URL__REQUEST = '/api/auth/request/';
     const URL__AUTH    = '/api/auth/auth/';
 
-    const TYPE__POST    = 'post';
-    const TYPE__GET     = 'get';
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $siteName;
 
-    /**
-     * @var
-     */
+    /** @var */
     protected $login;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $apiKey;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected static $accessId;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $instances = [];
 
     /**
@@ -98,7 +83,7 @@ abstract class Rest
      * @return bool
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function isAuth()
+    public static function isAuth(): bool
     {
         return strlen(self::$accessId) > 0;
     }
@@ -166,9 +151,10 @@ abstract class Rest
      * @param bool $reload
      * @return static
      * @throws ArgumentOutOfRangeException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function getInstance($reload = false)
+    public static function getInstance(bool $reload = false): Rest
     {
         return self::build(get_called_class(), $reload);
     }
@@ -178,18 +164,17 @@ abstract class Rest
      * @param bool $reload
      * @return mixed
      * @throws ArgumentOutOfRangeException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function build($className, $reload = false)
+    public static function build($className, bool $reload = false)
     {
         if (!strlen($className) || !(class_exists($className)))
             throw new ArgumentOutOfRangeException('className');
 
-        if (!isset(self::$instances[$className]) || $reload){
-
-            $options    = Options::get();
-            $restObject = new $className($options->getSiteName(),
-                $options->getLogin(), $options->getApiKey());
+        if (!isset(self::$instances[$className]) || $reload)
+        {
+            $restObject = new $className(Options::getSite(), Options::getLogin(), Options::getApiKey());
 
             if (!$restObject instanceof Rest)
                 throw new ArgumentOutOfRangeException('instance');
@@ -201,15 +186,6 @@ abstract class Rest
     }
 
     /**
-     * @throws SystemException
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    public static function clearCookie()
-    {
-        file_put_contents(self::getCookiePath(), '');
-    }
-
-    /**
      * @param       $url
      * @param array $data
      * @return mixed
@@ -218,7 +194,7 @@ abstract class Rest
      */
     protected function requestPost($url, array $data = array())
     {
-        return $this->request(self::TYPE__POST, $url, $data);
+        return $this->request($url, $data);
     }
 
     /**
@@ -226,22 +202,10 @@ abstract class Rest
      * @param array $data
      * @return mixed
      * @throws SystemException
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    protected function requestGet($url, array $data = array())
-    {
-        return $this->request(self::TYPE__GET, $url, $data);
-    }
-
-    /**
-     * @param       $type
-     * @param       $url
-     * @param array $data
-     * @return mixed
-     * @throws SystemException
+     * @throws ArgumentException
      * @author Pavel Shulaev (https://rover-it.me)3
      */
-    private function request($type, $url, array $data = array())
+    private function request($url, array $data = array())
     {
         // add access_id
         if (($url != self::URL__REQUEST)
@@ -255,75 +219,31 @@ abstract class Rest
 
         $requestUrl = $this->siteName . $url;
 
-        if ($type == self::TYPE__GET)
-            $requestUrl .= '?' . http_build_query($data);
+        $clientOptions = [
+            'socketTimeout' => 10,
+            'streamTimeout' => 20,
+            'compress'      => true,
+            'disableSslVerification' => true
+        ];
 
-        $ch = curl_init();
+        $client = new HttpClient($clientOptions);
+        $client->setHeader('User-Agent', "Rover-CB-API-client/1.1");
+        $body = Json::encode($data);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-       // curl_setopt($ch, CURLOPT_USERAGENT, "AmoCRM-API-client/1.0");
-        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        $client->query(HttpClient::HTTP_POST, $requestUrl, $body);
+        $response   = Json::decode($client->getResult());
+        $status     = $client->getStatus();
 
-        if ($type == self::TYPE__POST) {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, Json::encode($data));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        }
-
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, self::getCookiePath());
-        curl_setopt($ch, CURLOPT_COOKIEJAR, self::getCookiePath());
-
-        // for ssl
-        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch,CURLOPT_SSL_VERIFYHOST, 0);
-
-        $out    = curl_exec($ch);
-        $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        curl_close($ch);
-
-        $response = strlen($out)
-            ? Json::decode($out)
-            : array();
-
-        if ((($code == 200) || ($code == 201) || ($code == 204))
-            && array_key_exists('code', $response) && $response['code'] == 0)
+        if (in_array($status, [200, 201, 204]))
             return $response;
 
-        // clear cookie
-        self::clearCookie();
+        $errorMessage = $response['ERROR'] ?? ($response['message'] ?? 'error');
 
-        $errorMessage = isset($response['ERROR'])
-            ? $response['ERROR']
-            : (isset($response['message'])
-                ? $response['message']
-                : 'error');
-
-        $errorCode = isset($response['code'])
-            ? $response['code']
-            : 'n/a';
+        $errorCode = $response['code'] ?? 'n/a';
 
         $errorMessage .= ' (' . $errorCode . ')';
 
-        throw new SystemException($errorMessage, $code);
-    }
-
-    /**
-     * @return string
-     * @throws SystemException
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    public static function getCookiePath()
-    {
-        $dir = Application::getDocumentRoot() . '/upload/rover.cb/';
-
-        $dependence = new Dependence();
-        if (!$dependence->checkDir($dir)->getResult())
-            throw new SystemException(implode('<br>', $dependence->getErrors()));
-
-        return $dir . 'cookie.txt';
+        throw new SystemException($errorMessage, $status);
     }
 
     /**
@@ -332,7 +252,7 @@ abstract class Rest
      * @return array
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    protected function filter(array $data, array $filter)
+    protected function filter(array $data, array $filter): array
     {
         $result = array();
         foreach ($data['data'] as $tableId => $tableData)

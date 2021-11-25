@@ -1,5 +1,5 @@
 <?php
-namespace Rover\CB\Config;
+namespace Rover\CB\Service;
 /**
  * Created by PhpStorm.
  * User: lenovo
@@ -8,10 +8,11 @@ namespace Rover\CB\Config;
  *
  * @author Pavel Shulaev (https://rover-it.me)
  */
-use Bitrix\Main\Application;
-use Bitrix\Main\Loader;
+use Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ModuleManager;
 use \Bitrix\Main\Localization\Loc;
+use Rover\CB\Helper\Log;
+use Rover\CB\Rest\Tables;
 
 Loc::loadMessages(__FILE__);
 /**
@@ -23,36 +24,44 @@ Loc::loadMessages(__FILE__);
 
 class Dependence
 {
-	const MIN_VERSION__FADMIN   = '1.6.9';
-	const MIN_VERSION__PARAMS   = '0.9.4';
 	const MIN_VERSION__MAIN     = '15.5.4';
     const MIN_VERSION__PHP      = 50306;
+    /**
+     * connected flag
+     *
+     * @var bool
+     */
+    public static $connected;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $errors = array();
 
     /**
-     * @var bool
+     * @param bool $reload
+     * @return bool
+     * @throws ArgumentNullException
+     * @author Pavel Shulaev (https://rover-it.me)
      */
-	protected $result;
+    public static function isConnected(bool $reload = false): bool
+    {
+        if (is_null(self::$connected) || $reload)
+            try {
+                self::$connected = Tables::getInstance()->isAuth();
+            } catch (\Exception $e) {
+                self::$connected = false;
+                Log::addError('connection error:', $e->getMessage());
+            }
 
-	/**
-	 *
-	 */
-	public function __construct()
-	{
-		$this->reset();
-	}
+        return self::$connected;
+    }
 
-	/**
-	 * @return mixed
-	 * @author Pavel Shulaev (https://rover-it.me)
+    /**
+	 * @return bool
+     * @author Pavel Shulaev (https://rover-it.me)
 	 */
-	public function getResult()
-	{
-		return $this->result;
+	public function getResult(): bool
+    {
+		return empty($this->getErrors());
 	}
 
 	/**
@@ -62,44 +71,15 @@ class Dependence
 	protected function addError($error)
 	{
         $this->errors[] = trim($error);
-        $this->result   = false;
 	}
 
-    /**
-     * @return $this
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-	public function checkTrialElapsedDays()
-    {
-        $this->reset();
-
-        $mode = Loader::includeSharewareModule('rover.cb');
-        if ($mode == Loader::MODULE_DEMO)
-            $this->addError(Loc::getMessage('rover-cb__is_trial'));
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-	public function checkTrialExpired()
-    {
-        $mode = Loader::includeSharewareModule('rover.cb');
-
-        if ($mode == Loader::MODULE_DEMO_EXPIRED)
-            $this->addError(Loc::getMessage('rover-cb__trial_expired'));
-
-        return $this;
-    }
 
 	/**
 	 * @return $this
 	 * @author Pavel Shulaev (https://rover-it.me)
 	 */
-	public function checkPhpVer()
-	{
+	public function checkPhpVer(): Dependence
+    {
         if (PHP_VERSION_ID < self::MIN_VERSION__PHP)
             $this->addError(Loc::getMessage('rover-cb__php_version_error', array(
                 '#min_php_version#' => self::MIN_VERSION__PHP
@@ -108,23 +88,11 @@ class Dependence
 		return $this;
 	}
 
-	/**
-	 * @return $this
-	 * @author Pavel Shulaev (https://rover-it.me)
-	 */
-	public function checkCurl()
-	{
-		if (!function_exists('curl_init'))
-			$this->addError(Loc::getMessage('rover-cb__no_curl_error'));
-
-		return $this;
-	}
-
     /**
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-	public function checkModRewrite()
+	public function checkModRewrite(): Dependence
     {
         ob_start();
         phpinfo(INFO_MODULES);
@@ -140,43 +108,20 @@ class Dependence
 	 * @return $this
 	 * @author Pavel Shulaev (https://rover-it.me)
 	 */
-	public function checkMainVer()
-	{
+	public function checkMainVer(): Dependence
+    {
 		if (!CheckVersion(self::getVersion('main'), self::MIN_VERSION__MAIN))
 			$this->addError(Loc::getMessage('rover-cb__main-version-error'));
 
 		return $this;
 	}
 
-	/**
-	 * @return $this
-	 * @author Pavel Shulaev (https://rover-it.me)
-	 */
-	public function checkFadminVer()
-	{
-		if (!ModuleManager::isModuleInstalled('rover.fadmin'))
-			$this->addError(Loc::getMessage('rover-cb__rover-fadmin_not_found'));
-		elseif (!CheckVersion(self::getVersion('rover.fadmin'), self::MIN_VERSION__FADMIN))
-			$this->addError(Loc::getMessage('rover-cb__fadmin-version-error'));
-
-		return $this;
-	}
-
-    /**
-     * @return $this
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-	public function checkCookieDir()
-    {
-        return self::checkDir(Application::getDocumentRoot() . '/upload/rover.cb/');
-    }
-
     /**
      * @param $dir
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function checkExists($dir)
+    public function checkExists($dir): Dependence
     {
         if (!file_exists($dir) && !mkdir($dir))
             $this->addError(Loc::getMessage('rover-cb__mkdir-error', array('#dir#' => $dir)));
@@ -189,7 +134,7 @@ class Dependence
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function checkWritable($path)
+    public function checkWritable($path): Dependence
     {
         if (!is_writable($path))
             $this->addError(Loc::getMessage('rover-cb__writable-error', array('#path#' => $path)));
@@ -202,7 +147,7 @@ class Dependence
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function checkDir($dir)
+    public function checkDir($dir): Dependence
     {
         return $this->checkExists($dir)
             ->checkWritable($dir);
@@ -212,23 +157,21 @@ class Dependence
 	 * @return $this
 	 * @author Pavel Shulaev (https://rover-it.me)
 	 */
-	public function checkBase()
-	{
+	public function checkBase(): Dependence
+    {
 		$this->reset();
 
 		return $this
 			->checkPhpVer()
 			->checkMainVer()
-			->checkCurl()
-			->checkModRewrite()
-			->checkFadminVer();
+			->checkModRewrite();
 	}
 
     /**
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-	public function checkCritical()
+	public function checkCritical(): Dependence
     {
         $this->reset();
 
@@ -275,10 +218,9 @@ class Dependence
      * @return $this
      * @author Pavel Shulaev (https://rover-it.me)
      */
-	public function reset()
-	{
+	public function reset(): Dependence
+    {
 		$this->errors = array();
-		$this->result = true;
 
 		return $this;
 	}
@@ -287,8 +229,8 @@ class Dependence
 	 * @return array
 	 * @author Pavel Shulaev (https://rover-it.me)
 	 */
-	public function getErrors()
-	{
+	public function getErrors(): array
+    {
 		return $this->errors;
 	}
 }

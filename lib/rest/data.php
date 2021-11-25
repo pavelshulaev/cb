@@ -11,6 +11,7 @@
 namespace Rover\CB\Rest;
 
 use Bitrix\Main\ArgumentNullException;
+use Bitrix\Main\SystemException;
 use Rover\CB\Rest;
 
 /**
@@ -28,14 +29,14 @@ abstract class Data extends Rest
 
     /**
      * @param       $tableId
-     * @param array $fields
      * @param bool  $cals
-     * @return mixed
+     * @param array $fields
+     * @return array|mixed
      * @throws ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function create($tableId, $cals = false, array $fields = array())
+    public function create($tableId, bool $cals = false, array $fields = array())
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -60,10 +61,10 @@ abstract class Data extends Rest
      * @param int   $limit
      * @return mixed
      * @throws ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public function read($tableId, $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
+    public function read($tableId, bool $cals = false, array $fields = array(), array $filter = array(), array $sort = array(), $start = 0, $limit = 500)
     {
         $tableId = intval($tableId);
         if (!$tableId)
@@ -89,7 +90,7 @@ abstract class Data extends Rest
      * @param array $filter
      * @return mixed
      * @throws ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function update($tableId, $cals = false, array $fields = array(), array $filter = array())
@@ -114,7 +115,7 @@ abstract class Data extends Rest
      * @param array $filter
      * @return mixed
      * @throws ArgumentNullException
-     * @throws \Bitrix\Main\SystemException
+     * @throws SystemException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public function delete($tableId, $cals = false, array $filter = array())

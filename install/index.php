@@ -2,7 +2,7 @@
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
-use Rover\CB\Config\Dependence;
+use Rover\CB\Service\Dependence;
 use \Bitrix\Main\SystemException;
 
 Loc::LoadMessages(__FILE__);
