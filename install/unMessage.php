@@ -1,13 +1,13 @@
 <?php
 
 use Bitrix\Main\Localization\Loc;
-
+Loc::loadMessages($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/admin/module_admin.php');
 global $APPLICATION, $cbErrors;
 
 if (!$cbErrors)
-    echo \CAdminMessage::ShowNote(Loc::getMessage("MOD_UNINST_OK"));
+    \CAdminMessage::ShowNote(Loc::getMessage("MOD_UNINST_OK"));
 else
-    echo \CAdminMessage::ShowMessage(
+    \CAdminMessage::ShowMessage(
         array(
             "TYPE"      => "ERROR",
             "MESSAGE"   => Loc::getMessage("MOD_UNINST_ERR"),

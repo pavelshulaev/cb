@@ -34,9 +34,9 @@ class Admin
         return [
             [
                 'TAB'   => Loc::getMessage(self::TAB__MAIN . '_label')
-                    . Dependence::isConnected()
+                    . (Dependence::isConnected()
                         ? ' [' . Loc::getMessage('rover-cb__connected') . ']'
-                        : ' [' . Loc::getMessage('rover-cb__disconnected') . ']',
+                        : ' [' . Loc::getMessage('rover-cb__disconnected') . ']'),
                 'DIV'   => self::TAB__MAIN,
                 'TITLE' => Loc::getMessage(self::TAB__MAIN . '_descr')
             ],
@@ -78,8 +78,9 @@ class Admin
     public static function getCheckboxHelp($help, bool $br = false): string
     {
         $help = trim($help);
-        if (!strlen($help))
+        if (!strlen($help)) {
             return '';
+        }
 
         return '>' . ($br ? '<br>' : '') . '<span style="color: gray; font-size: 85%"> ' . $help . '</span';
     }
@@ -93,8 +94,9 @@ class Admin
     public static function getHelp($help, bool $br = false): string
     {
         $help = trim($help);
-        if (!strlen($help))
+        if (!strlen($help)) {
             return '';
+        }
 
         return ($br ? '<br>' : '') . '<span style="color: gray; font-size: 85%"> ' . $help . '</span>';
     }

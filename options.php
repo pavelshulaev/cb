@@ -5,6 +5,8 @@ use Bitrix\Main\Loader;
 use Rover\CB\Admin;
 use Rover\CB\Options;
 use Rover\CB\Rest;
+use Rover\CB\Snippet\ToolbarSnippet;
+use Rover\CB\Snippet\VersionReminder;
 
 Loc::LoadMessages(__FILE__);
 Loc::loadMessages($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/options.php");
@@ -15,18 +17,54 @@ if (!Loader::includeModule($mid))
     return;
 }
 
+// предзаполненная тема экономит клиенту набор текста и подсказывает нам модуль в заявке
+$supportLink = static function (string $type, string $titleMessageId) use ($mid): string {
+    $title = Loc::getMessage($titleMessageId, ['#module#' => Loc::getMessage('rover-cb__MODULE_NAME')]);
+
+    return 'https://rover-it.me/support/new/?module=' . $mid . '&type=' . $type . '&title=' . urlencode($title);
+};
+
+$supportQuestionLink      = $supportLink('consultation', 'rover-cb__support-title-question');
+$supportCustomizationLink = $supportLink('customization', 'rover-cb__support-title-customization');
+
+VersionReminder::show();
+
+ToolbarSnippet::show([
+    'RIGHT' => [
+        [
+            'TEXT'   => Loc::getMessage('rover-cb__reminder-btn-review'),
+            'LINK'   => 'https://marketplace.1c-bitrix.ru/solutions/' . $mid . '/#tab-rating-link',
+            'TARGET' => '_blank',
+            'CLASS'  => 'ui-btn-success ui-btn-sm ui-btn-icon-edit',
+        ],
+        [
+            'TEXT'   => Loc::getMessage('rover-cb__reminder-btn-question'),
+            'LINK'   => $supportQuestionLink,
+            'TARGET' => '_blank',
+            'CLASS'  => 'ui-btn-secondary ui-btn-sm ui-btn-icon-task',
+        ],
+        [
+            'TEXT'   => Loc::getMessage('rover-cb__reminder-btn-order'),
+            'LINK'   => $supportCustomizationLink,
+            'TARGET' => '_blank',
+            'CLASS'  => 'ui-btn-light-border ui-btn-sm ui-btn-icon-setting',
+        ],
+        [
+            'TEXT'   => Loc::getMessage('rover-cb__reminder-btn-other'),
+            'LINK'   => 'https://rover-it.me/catalog/moduli_dlya_1c_bitriks/',
+            'TARGET' => '_blank',
+            'CLASS'  => 'ui-btn-light ui-btn-sm ui-btn-icon-list',
+        ],
+    ],
+]);
+
 $arAllOptions = Admin::getAllOptions();
 
 $aTabs = Admin::getMap();
 
 if((isset($request['save']) || isset($request['apply']) ) && check_bitrix_sessid())
-{
-    Rest::clearCookie();
-
     foreach ($aTabs as $tab)
         __AdmSettingsSaveOptions($mid, $arAllOptions[$tab['DIV']]);
-}
-
 
 // update values
 $arAllOptions = Admin::getAllOptions();

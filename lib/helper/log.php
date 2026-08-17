@@ -11,9 +11,10 @@
 namespace Rover\CB\Helper;
 
 use Bitrix\Main\Application;
-use Rover\CB\Service\Dependence;
+use Bitrix\Main\ArgumentNullException;
 use Rover\CB\Options;
-use Rover\CB\Options as OptionsAlias;
+use Rover\CB\Service\Dependence;
+
 /**
  * Class Log
  *
@@ -23,18 +24,13 @@ use Rover\CB\Options as OptionsAlias;
 class Log
 {
 
-    const FILE__NOTE    = 'note.log';
-    const FILE__ERROR   = 'error.log';
-
-    /**
-     * @var
-     */
-    protected static $enabled;
+    const FILE__NOTE  = 'note.log';
+    const FILE__ERROR = 'error.log';
 
     /**
      * @param      $message
      * @param null $data
-     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public static function addNote($message, $data = null)
@@ -45,7 +41,7 @@ class Log
     /**
      * @param      $message
      * @param null $data
-     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public static function addError($message, $data = null)
@@ -57,29 +53,30 @@ class Log
      * @param      $file
      * @param      $message
      * @param null $data
-     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws ArgumentNullException
      * @author Pavel Shulaev (https://rover-it.me)
      */
     public static function add($file, $message, $data = null)
     {
-        if (is_null(self::$enabled))
-            self::$enabled = Options::isLogEnabled();
-
-        if (self::$enabled != 'Y')
+        if (!Options::isLogEnabled()) {
             return;
+        }
 
         $fullPath = self::getPath($file);
-        if (!$fullPath)
+        if (!$fullPath) {
             return;
+        }
 
         self::checkMaxSize($fullPath);
 
-        if (is_array($message))
+        if (is_array($message)) {
             $message = print_r($message, true);
+        }
 
-        if (!empty($data)){
-            if (is_array($data))
+        if (!empty($data)) {
+            if (is_array($data)) {
                 $data = print_r($data, true);
+            }
 
             $message .= "\n" . $data;
         }
@@ -91,55 +88,60 @@ class Log
      * @param $path
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function checkMaxSize($path)
+    public static function checkMaxSize($path): void
     {
         $logMaxSize = 1024 * 1024;
-        if (!$logMaxSize)
+        if (!$logMaxSize) {
             return;
+        }
 
-        if (filesize($path) > $logMaxSize)
+        if (filesize($path) > $logMaxSize) {
             file_put_contents($path, '');
+        }
     }
 
     /**
-     * @return null|string
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    public static function getDir()
-    {
-        return Application::getDocumentRoot() . '/upload/rover.amocrm/log/';
-    }
-
-    /**
-     * @param $fileName
-     * @return bool|mixed
-     * @author Pavel Shulaev (https://rover-it.me)
-     */
-    public static function getPath($fileName)
-    {
-        $fileName = trim($fileName);
-        if (!$fileName)
-            return false;
-
-        $dir            = self::getDir();
-        $dependence     = new Dependence();
-        $createResult   = $dependence->checkDir($dir)->getResult();
-        if (!$createResult)
-            return false;
-
-        return str_replace(array('///', '//'), '/', $dir . '/' . $fileName);
-    }
-
-    /**
-     * @param $file
      * @return string
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function getFileSize($file)
+    public static function getDir(): string
+    {
+        return Application::getDocumentRoot() . '/upload/' . Options::MODULE_ID . '/log/';
+    }
+
+    /**
+     * @param string $fileName
+     * @return bool|mixed
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function getPath(string $fileName): ?string
+    {
+        $fileName = trim($fileName);
+        if (!$fileName) {
+            return null;
+        }
+
+        $dir          = self::getDir();
+        $dependence   = new Dependence();
+        $createResult = $dependence->checkDir($dir)->getResult();
+        if (!$createResult) {
+            return null;
+        }
+
+        return str_replace(['///', '//'], '/', $dir . '/' . $fileName);
+    }
+
+    /**
+     * @param string $file
+     * @return string
+     * @author Pavel Shulaev (https://rover-it.me)
+     */
+    public static function getFileSize(string $file): string
     {
         $path = self::getPath($file);
-        if (!$path || !is_file($path))
+        if (!$path || !is_file($path)) {
             return 'n/a';
+        }
 
         return self::getStrFileSize(filesize($path));
     }
@@ -150,11 +152,13 @@ class Log
      * @return string
      * @author Pavel Shulaev (https://rover-it.me)
      */
-    public static function getStrFileSize($size, $round=2)
+    public static function getStrFileSize($size, int $round = 2)
     {
-        $sizes = array('B', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb');
-        for ($i=0; $size > 1024 && $i < count($sizes) - 1; $i++) $size /= 1024;
+        $sizes = ['B', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb', 'Zb', 'Yb'];
+        for ($i = 0; $size > 1024 && $i < count($sizes) - 1; $i++) {
+            $size /= 1024;
+        }
 
-        return round($size,$round)." ".$sizes[$i];
+        return round($size, $round) . " " . $sizes[$i];
     }
 }
